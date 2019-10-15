@@ -42,6 +42,13 @@ public class LivroBean {
         return new DAO<Livro>(Livro.class).listaTodos();
     }
 
+	public String formAutor() {
+		System.out.println("chamando o formulário do autor");
+		return "autor?faces-redirect=true"; //devolver apenas o nome da página sem a extensão .xhtml
+		//?faces-redirect=true faz com que o controlador chame uma nova requisição para a página de autor, assim 
+		//fica na barra de endereço 'livraria/autor.xhtml', não mais 'livraria/livro.xhtml' como antes
+	}
+	
 	public void gravar() {
 		System.out.println("Gravando livro " + this.livro.getTitulo());
 

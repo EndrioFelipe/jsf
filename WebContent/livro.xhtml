@@ -2,15 +2,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"> <!-- esse novo namespace ativará novas funcionalidades como o itens que é tipo foreach -->
+	xmlns:f="http://java.sun.com/jsf/core" 
+	xmlns:ui="http://java.sun.com/jsf/facelets"> <!-- esse novo namespace 'http://java.sun.com/jsf/core' ativará novas funcionalidades como o itens que é tipo foreach -->
 
-<h:head/> <!-- habiliata o ajax pq no head é chamado para adicionar um arquivo javascript para tal -->
-<!-- agora é possível gravar um autor independentemente do que acontece com o restante do formulário -->
 
-<h:body>
-	<h1>Novo Livro</h1>
+
+<ui:composition template="_template.xhtml">
+	<ui:define name="titulo">Novo livro</ui:define>
+	<ui:define name="conteudo">
 	<h:form>
-		<h:messages/> <!-- exibe mensagens geradas automaticamente pelo JSF -->
+		
+		<h:messages id="mensagens"/> <!-- exibe mensagens geradas automaticamente pelo JSF -->
 		
 		<p>mensagem doi título</p>
 		<h:message for="titulo"></h:message>
@@ -21,11 +23,15 @@
 				<h:outputLabel value="Titulo:" for="titulo" />
 				<h:inputText id="titulo" value="#{livroBean.livro.titulo}" required="true" requiredMessage="Título obrigatório" validatorMessage="Máximo de 40 caracteres">
 					<f:validateLength maximum="40"/> <!-- define um valor máximo de caracteres em 40 para o título do livro -->
+					<f:ajax event="blur" render="mensagens"/> <!-- aqui no event, assim que o campo perde o foco, a requisição ajax é enviada -->
+					<!-- no render, assim que o campo perder o foco a mensagem é lançada se não tiver nada -->
 				</h:inputText>
 				
 
 				<h:outputLabel value="ISBN:" for="isbn" />
-				<h:inputText id="isbn" value="#{livroBean.livro.isbn}" validator="#{livroBean.comecaComDigitoUm}"/>
+				<h:inputText id="isbn" value="#{livroBean.livro.isbn}" validator="#{livroBean.comecaComDigitoUm}">
+					<f:ajax event="keyup" render="mensagens"/>
+				</h:inputText>
 				
 				<h:outputLabel value="Preço:" for="preco" />
 				<h:inputText id="preco" value="#{livroBean.livro.preco}" label="Preço">
@@ -55,19 +61,27 @@
        			 itemLabel="#{autor.nome}" itemValue="#{autor.id}"/> <!-- var é pega todos de lista.autores, depois armazenamos essa variávem em var com o nome de 'autor'. lista.autores.nome não funciona-->
 			</h:selectOneMenu>
 			<h:commandButton value="Gravar Autor" action="#{livroBean.gravarAutor}">
-				<f:ajax execute="autor" />
+				<f:ajax execute="autor" render="tabelaAutores"/> <!-- agora e ajax só vai ser acionado após renderizar toda a tabela de autores -->
 			</h:commandButton>
-			<h:dataTable value="#{livroBean.autoresDoLivro}" var="autor">
+			
+			<h:commandLink value="cadastrar autor" action="#{livroBean.formAutor}" immediate="true"/> <!-- aqui o action vai direcionar ao método formAutor(), o imediate="true" vai ignorar as outras
+			fases do jsf que envolve atualizar a página, fazendo que esse link seja acionado imediatamente-->
+			
+			<h:dataTable value="#{livroBean.autoresDoLivro}" var="autor" id="tabelaAutores">
 				<h:column>
 					<h:outputText value="#{autor.nome}"/> <!-- isso aqui vai só mostrar o autor que foi selecionado após clicar em gravar autor, assim, qdo se vc selecionar um autor e pedir pra gravar, depois gravar outro autor, o mesmo livro passa a ser associado a dois autores na tabela livro_autor, mas teremos apenas mais um novo livro. Isso é para livros que contém mais de um autor. -->
 				</h:column>
 			</h:dataTable>			
 		</fieldset>
 
-		<h:commandButton value="Gravar" action="#{livroBean.gravar}" />
+		<h:commandButton value="Gravar" action="#{livroBean.gravar}">
+			<f:ajax execute="@form" render="@form :tabelaLivro"/> <!-- aqui o execute faz o cadastro do livro por ajax com o @form q considera todo o formulário -->
+			<!-- além disso, assim que a requisição ajax for enviada, vai renderizar o formulário de novo e também vai renderizar a tabela dos livros -->
+			<!-- o ':' na frente de tabelaLivro indica que ele tá buscando um id que está fora do <h:form> -->
+		</h:commandButton>
 	</h:form>
 	
-		<h:dataTable value="#{livroBean.livros}" var="livro">
+		<h:dataTable value="#{livroBean.livros}" var="livro" id="tabelaLivro">
             <h:column>
                 <f:facet name="header">Titulo</f:facet>
                 <h:outputText value="#{livro.titulo}" />
@@ -87,6 +101,10 @@
 			  </h:outputText>
 			</h:column>
         </h:dataTable>
-</h:body>
+        </ui:define>
+        <ui:define name="texto">
+		  Cadastro de Livros
+		</ui:define>
+</ui:composition>
 
 </html>
