@@ -59,8 +59,13 @@ public class LivroBean {
 			FacesContext.getCurrentInstance().addMessage("autor", new FacesMessage("o Livro de ter pelo menos um autor."));
 			return; //interrompe o método e não grava o livro
 		}
-
-		new DAO<Livro>(Livro.class).adiciona(this.livro);
+		System.out.println("id: "+this.livro.getId().getClass());
+		if(this.livro.getId() == null) {
+			new DAO<Livro>(Livro.class).adiciona(this.livro);
+		}	else {
+			System.out.println("veio aqui?");
+			new DAO<Livro>(Livro.class).atualiza(this.livro);
+		}
 		
 		this.livro = new Livro();
 	}
@@ -72,6 +77,14 @@ public class LivroBean {
 	public void gravarAutor() {
 		Autor autor = new DAO<Autor>(Autor.class).buscaPorId(this.autorId);
 		this.livro.adicionaAutor(autor);
+	}
+	
+	public void remover(Livro livro) {
+		new DAO<Livro>(Livro.class).remove(livro);
+	}
+	
+	public void carregar(Livro livro) {
+		this.livro = livro;
 	}
 	
 	//vamos criar um validator personalizado

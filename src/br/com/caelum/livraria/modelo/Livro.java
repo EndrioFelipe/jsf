@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -26,7 +27,8 @@ public class Livro {
 	@Temporal(TemporalType.TIMESTAMP) //esse considera as horas. No pattern da view vamos ter: pattern="dd/MM/yyyy HH:mm"
 	private Calendar dataLancamento = Calendar.getInstance();
 
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.EAGER) //aqui, na hora de carregar o livro para não dar LazyInitialiazationException, pq o restante do livro era carregado na tela de formulário, mas 
+	//não carregava os autores
 	private List<Autor> autores = new ArrayList<Autor>();
 
 	public List<Autor> getAutores() {

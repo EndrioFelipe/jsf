@@ -75,32 +75,43 @@
 		</fieldset>
 
 		<h:commandButton value="Gravar" action="#{livroBean.gravar}">
-			<f:ajax execute="@form" render="@form :tabelaLivro"/> <!-- aqui o execute faz o cadastro do livro por ajax com o @form q considera todo o formulário -->
+			<f:ajax execute="@form" render="@form :formTabelaLivros:tabelaLivro"/> <!-- aqui o execute faz o cadastro do livro por ajax com o @form q considera todo o formulário -->
 			<!-- além disso, assim que a requisição ajax for enviada, vai renderizar o formulário de novo e também vai renderizar a tabela dos livros -->
-			<!-- o ':' na frente de tabelaLivro indica que ele tá buscando um id que está fora do <h:form> -->
+			<!-- o ':formTabelaLivros:tabelaLivro' na frente de tabelaLivro indica que ele tá buscando um id de uma tabela que está em um outro form -->
 		</h:commandButton>
 	</h:form>
-	
-		<h:dataTable value="#{livroBean.livros}" var="livro" id="tabelaLivro">
-            <h:column>
-                <f:facet name="header">Titulo</f:facet>
-                <h:outputText value="#{livro.titulo}" />
-            </h:column>
-            <h:column>
-                <f:facet name="header">ISBN</f:facet>
-                <h:outputText value="#{livro.isbn}" />
-            </h:column>
-            <h:column>
-                <f:facet name="header">Preço</f:facet>
-                <h:outputText value="#{livro.preco}" />
-            </h:column>
-            <h:column>
-			  <f:facet name="header">Data</f:facet>
-			  <h:outputText value="#{livro.dataLancamento.time}">
-			      <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" />
-			  </h:outputText>
-			</h:column>
-        </h:dataTable>
+		<h:form id="formTabelaLivros">
+			<h:dataTable value="#{livroBean.livros}" var="livro" id="tabelaLivro"> <!-- aqui é um forEach que vai renderizar a lista de livros -->
+	            <h:column>
+	                <f:facet name="header">Titulo</f:facet>
+	                <h:outputText value="#{livro.titulo}" />
+	            </h:column>
+	            <h:column>
+	                <f:facet name="header">ISBN</f:facet>
+	                <h:outputText value="#{livro.isbn}" />
+	            </h:column>
+	            <h:column>
+	                <f:facet name="header">Preço</f:facet>
+	                <h:outputText value="#{livro.preco}" />
+	            </h:column>
+	            <h:column>
+				  <f:facet name="header">Data</f:facet>
+				  <h:outputText value="#{livro.dataLancamento.time}">
+				      <f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" />
+				  </h:outputText>
+				</h:column>
+				
+				<h:column>
+				  <f:facet name="header">Alterar</f:facet>
+				  <h:commandLink value="altera" action="#{livroBean.carregar(livro)}"/> 
+				</h:column>
+				
+				<h:column>
+				  <f:facet name="header">Remover</f:facet>
+				  <h:commandLink value="remover" action="#{livroBean.remover(livro)}"/> <!-- este 'livro' dentro do parenteses está associado o livro do atributo var em h:dataTable -->
+				</h:column>
+	        </h:dataTable>
+        </h:form>
         </ui:define>
         <ui:define name="texto">
 		  Cadastro de Livros
